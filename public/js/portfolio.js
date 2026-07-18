@@ -43,15 +43,15 @@
     /* ---- Formulario estático de contacto ------------------------------- */
 
     const setupStaticContactForm = () => {
-        const form = document.querySelector("[data-static-contact-form]");
+        const form =
+            document.getElementById("portfolio-contact-form") ||
+            document.querySelector("[data-static-contact-form]");
 
-        if (!form) {
+        if (!form || !form.matches("[data-static-contact-form]")) {
             return;
         }
 
         const email = form.dataset.contactEmail || "";
-        const baseSubject =
-            form.dataset.contactSubject || "Nuevo proyecto desde el portafolio";
         const message = form.querySelector("[data-static-contact-message]");
 
         if (!email) {
@@ -66,13 +66,24 @@
             }
 
             const data = new FormData(form);
-            const name = String(data.get("name") || "").trim();
-            const sender = String(data.get("email") || "").trim();
-            const projectType = String(data.get("subject") || "").trim();
-            const bodyMessage = String(data.get("message") || "").trim();
+            const getField = (...names) => {
+                for (const name of names) {
+                    const value = String(data.get(name) || "").trim();
+
+                    if (value) {
+                        return value;
+                    }
+                }
+
+                return "";
+            };
+            const name = getField("nombre", "name");
+            const sender = getField("correo", "email");
+            const projectType = getField("tipo_proyecto", "subject");
+            const bodyMessage = getField("mensaje", "message");
             const subject = projectType
-                ? `${baseSubject} - ${projectType}`
-                : baseSubject;
+                ? `Consulta de proyecto: ${projectType}`
+                : "Nueva consulta desde el portafolio";
             const body = [
                 `Nombre: ${name}`,
                 `Correo: ${sender}`,
@@ -82,15 +93,16 @@
                 bodyMessage,
             ].join("\n");
 
-            window.location.href = `mailto:${email}?subject=${encodeURIComponent(
+            const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(
                 subject
             )}&body=${encodeURIComponent(body)}`;
 
+            window.location.href = mailtoUrl;
+
             if (message) {
-                message.classList.add("visible");
                 message.classList.remove("error");
                 message.textContent =
-                    "Se abrió tu cliente de correo con el mensaje preparado.";
+                    "Se abrira tu aplicacion de correo con el mensaje preparado.";
             }
         });
     };

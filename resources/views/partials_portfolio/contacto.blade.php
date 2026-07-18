@@ -2,9 +2,11 @@
     @php
         $isStaticExport = config('portfolio.static_export', false);
         $contactEmail = trim((string) config('portfolio.contact_email', ''));
-        $contactSubject = config('portfolio.contact_subject', 'Nuevo proyecto desde el portafolio');
-        $encodedContactSubject = rawurlencode($contactSubject);
         $canSendStaticContact = $contactEmail !== '';
+        $nameField = $isStaticExport ? 'nombre' : 'name';
+        $emailField = $isStaticExport ? 'correo' : 'email';
+        $projectTypeField = $isStaticExport ? 'tipo_proyecto' : 'subject';
+        $messageField = $isStaticExport ? 'mensaje' : 'message';
     @endphp
 
     <div class="container">
@@ -21,7 +23,7 @@
                     </h2>
 
                     <p class="section-description reveal reveal-left" style="--i: 2">
-                        Cuéntame sobre tu idea, sistema o proyecto. Podemos
+                        Cu&eacute;ntame sobre tu idea, sistema o proyecto. Podemos
                         transformar una necesidad concreta en una experiencia
                         digital completa.
                     </p>
@@ -46,7 +48,7 @@
                     </div>
 
                     <div class="contact-detail">
-                        <div class="contact-detail-label">Ubicación</div>
+                        <div class="contact-detail-label">Ubicaci&oacute;n</div>
                         <div class="contact-detail-value">Santiago, Chile</div>
                     </div>
 
@@ -61,26 +63,17 @@
             </div>
 
             <form
+                id="portfolio-contact-form"
                 class="contact-form reveal reveal-right"
                 style="--i: 1"
                 method="{{ $isStaticExport ? 'GET' : 'POST' }}"
-                action="{{ $isStaticExport && $canSendStaticContact ? 'mailto:' . $contactEmail . '?subject=' . $encodedContactSubject : ($isStaticExport ? '#contacto' : route('portfolio.contact.store')) }}"
-                @if ($isStaticExport) enctype="text/plain" @endif
+                action="{{ $isStaticExport ? '#contacto' : route('portfolio.contact.store') }}"
                 @if ($isStaticExport)
                     data-static-contact-form
                     data-contact-email="{{ $contactEmail }}"
-                    data-contact-subject="{{ $contactSubject }}"
                 @endif
             >
-                @if ($isStaticExport)
-                    <div class="form-message visible {{ $canSendStaticContact ? 'success' : 'error' }}" data-static-contact-message>
-                        @if ($canSendStaticContact)
-                            Esta versión estática abre tu cliente de correo para enviar el mensaje.
-                        @else
-                            Configura PORTFOLIO_CONTACT_EMAIL para habilitar el envío desde la versión estática.
-                        @endif
-                    </div>
-                @else
+                @if (! $isStaticExport)
                     @csrf
 
                     @if (session('success'))
@@ -98,15 +91,16 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="name">Nombre</label>
+                        <label class="form-label" for="{{ $nameField }}">Nombre</label>
 
                         <input
                             class="form-input"
                             type="text"
-                            id="name"
-                            name="name"
+                            id="{{ $nameField }}"
+                            name="{{ $nameField }}"
                             value="{{ old('name') }}"
                             placeholder="Tu nombre"
+                            autocomplete="name"
                             required
                         >
 
@@ -116,15 +110,16 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="email">Correo</label>
+                        <label class="form-label" for="{{ $emailField }}">Correo</label>
 
                         <input
                             class="form-input"
                             type="email"
-                            id="email"
-                            name="email"
+                            id="{{ $emailField }}"
+                            name="{{ $emailField }}"
                             value="{{ old('email') }}"
                             placeholder="correo@ejemplo.cl"
+                            autocomplete="email"
                             required
                         >
 
@@ -135,17 +130,18 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="subject">
+                    <label class="form-label" for="{{ $projectTypeField }}">
                         Tipo de proyecto
                     </label>
 
                     <input
                         class="form-input"
                         type="text"
-                        id="subject"
-                        name="subject"
+                        id="{{ $projectTypeField }}"
+                        name="{{ $projectTypeField }}"
                         value="{{ old('subject') }}"
                         placeholder="Sitio web, sistema, ecommerce..."
+                        autocomplete="off"
                         required
                     >
 
@@ -155,15 +151,16 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="message">
-                        Cuéntame sobre tu idea
+                    <label class="form-label" for="{{ $messageField }}">
+                        Cu&eacute;ntame sobre tu idea
                     </label>
 
                     <textarea
                         class="form-input"
-                        id="message"
-                        name="message"
+                        id="{{ $messageField }}"
+                        name="{{ $messageField }}"
                         placeholder="Describe brevemente tu proyecto..."
+                        autocomplete="off"
                         required
                     >{{ old('message') }}</textarea>
 
@@ -172,14 +169,26 @@
                     @enderror
                 </div>
 
-                <button
-                    type="submit"
-                    class="button button-primary"
-                    @if ($isStaticExport && ! $canSendStaticContact) disabled @endif
-                >
-                    Enviar mensaje
-                    <span class="button-arrow">→</span>
-                </button>
+                <div class="form-actions">
+                    <button
+                        type="submit"
+                        class="button button-primary"
+                        @if ($isStaticExport && ! $canSendStaticContact) disabled @endif
+                    >
+                        {{ $isStaticExport ? 'Enviar por correo' : 'Enviar mensaje' }}
+                        <span class="button-arrow">&rarr;</span>
+                    </button>
+
+                    @if ($isStaticExport)
+                        <p class="form-submit-note {{ ! $canSendStaticContact ? 'error' : '' }}" data-static-contact-message>
+                            @if ($canSendStaticContact)
+                                Se abrir&aacute; tu aplicaci&oacute;n de correo con el mensaje preparado.
+                            @else
+                                Configura PORTFOLIO_CONTACT_EMAIL para habilitar el env&iacute;o desde la versi&oacute;n est&aacute;tica.
+                            @endif
+                        </p>
+                    @endif
+                </div>
             </form>
         </div>
     </div>

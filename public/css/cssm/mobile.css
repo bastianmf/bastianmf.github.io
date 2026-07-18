@@ -387,6 +387,15 @@
         padding: 28px 22px;
     }
 
+    .form-actions {
+        align-items: stretch;
+    }
+
+    .form-submit-note {
+        max-width: none;
+        font-size: 0.7rem;
+    }
+
     .footer-content {
         flex-direction: column;
         text-align: center;

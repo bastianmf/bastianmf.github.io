@@ -1949,6 +1949,28 @@ textarea.form-input {
     color: #e8a0a0;
 }
 
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 11px;
+}
+
+.form-submit-note {
+    max-width: 430px;
+    margin: 0;
+    color: var(--ivory-muted);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    line-height: 1.6;
+    opacity: 0.72;
+}
+
+.form-submit-note.error {
+    color: #e8a0a0;
+    opacity: 0.86;
+}
+
 .field-error {
     display: block;
     margin-top: 8px;
