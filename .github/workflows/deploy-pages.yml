@@ -1,0 +1,107 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Configure GitHub Pages
+        id: configure-pages
+        uses: actions/configure-pages@v5
+
+      - name: Resolve export variables
+        id: export-vars
+        env:
+          CONFIGURED_BASE_PATH: ${{ vars.GITHUB_PAGES_BASE_PATH }}
+          CONFIGURED_SITE_URL: ${{ vars.PORTFOLIO_SITE_URL }}
+          CONFIGURED_CONTACT_EMAIL: ${{ vars.PORTFOLIO_CONTACT_EMAIL }}
+          PAGES_BASE_URL: ${{ steps.configure-pages.outputs.base_url }}
+        run: |
+          repo_name="${GITHUB_REPOSITORY#*/}"
+
+          if [ -n "${CONFIGURED_BASE_PATH}" ]; then
+            base_path="${CONFIGURED_BASE_PATH}"
+          elif [[ "${repo_name}" == *.github.io ]]; then
+            base_path=""
+          else
+            base_path="/${repo_name}"
+          fi
+
+          site_url="${CONFIGURED_SITE_URL:-${PAGES_BASE_URL}}"
+          site_url="${site_url%/}"
+
+          echo "base_path=${base_path}" >> "${GITHUB_OUTPUT}"
+          echo "site_url=${site_url}" >> "${GITHUB_OUTPUT}"
+          echo "contact_email=${CONFIGURED_CONTACT_EMAIL}" >> "${GITHUB_OUTPUT}"
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Prepare Laravel environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate --force
+
+      - name: Export static site
+        env:
+          APP_ENV: production
+          APP_DEBUG: false
+          APP_URL: ${{ steps.export-vars.outputs.site_url }}
+          GITHUB_PAGES_BASE_PATH: ${{ steps.export-vars.outputs.base_path }}
+          PORTFOLIO_SITE_URL: ${{ steps.export-vars.outputs.site_url }}
+          PORTFOLIO_CONTACT_EMAIL: ${{ steps.export-vars.outputs.contact_email }}
+        run: php artisan portfolio:export --site-url="${PORTFOLIO_SITE_URL}" --base-path="${GITHUB_PAGES_BASE_PATH}" --no-build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,63 @@
+/* ==========================================================================
+   footer.css — Pie de página, redes y volver arriba
+   ========================================================================== */
+
+.footer {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+}
+
+.footer-copy {
+    color: var(--gray);
+    font-size: 0.72rem;
+}
+
+.social-list {
+    display: flex;
+    gap: 10px;
+}
+
+.social-link {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sharp);
+    color: var(--ivory-muted);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    transition: var(--transition);
+}
+
+.social-link:hover,
+.social-link:focus-visible {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--black);
+    transform: translateY(-4px);
+}
+
+.back-to-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--gray);
+    font-family: var(--font-title);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: color var(--transition);
+}
+
+.back-to-top:hover {
+    color: var(--gold-light);
+}

@@ -1,0 +1,122 @@
+/* ==========================================================================
+   header.css — Header fijo, logo y navegación
+   ========================================================================== */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    padding: 22px 0;
+    border-bottom: 1px solid transparent;
+    transition: padding var(--transition), background var(--transition), border-color var(--transition);
+}
+
+.header.scrolled {
+    padding: 14px 0;
+    background: rgba(7, 7, 7, 0.92);
+    border-color: var(--border);
+    backdrop-filter: blur(18px);
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-symbol {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    color: var(--gold);
+    filter: drop-shadow(0 0 14px rgba(195, 163, 109, 0.18));
+    transition: filter var(--transition), transform var(--transition);
+}
+
+.logo-symbol img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+.logo:hover .logo-symbol {
+    filter: drop-shadow(0 0 20px rgba(227, 197, 143, 0.28));
+    transform: translateY(-2px);
+}
+
+.logo-text {
+    font-family: var(--font-title);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.nav-list {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    list-style: none;
+}
+
+.nav-link {
+    position: relative;
+    color: var(--ivory-muted);
+    font-size: 0.73rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: color var(--transition);
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 100%;
+    height: 1px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--transition);
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--gold-light);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.menu-button {
+    display: none;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sharp);
+    background: transparent;
+}
+
+.menu-button span {
+    display: block;
+    width: 20px;
+    height: 1px;
+    margin: 5px auto;
+    background: var(--ivory);
+    transition: var(--transition);
+}

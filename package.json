@@ -1,0 +1,10 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "node scripts/build-static-assets.mjs",
+        "export": "php artisan portfolio:export --no-build",
+        "preview": "php -S localhost:8080 -t dist",
+        "preview:pages": "powershell -ExecutionPolicy Bypass -File scripts/preview-github-pages.ps1"
+    }
+}

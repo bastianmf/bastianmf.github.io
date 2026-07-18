@@ -1,0 +1,398 @@
+/* ==========================================================================
+   cssm/mobile.css — Ajustes responsive generales
+   Se carga después del CSS de página para poder ajustar cualquier vista.
+   Breakpoints: 1000px (tablet) · 820px (menú móvil) · 640px (teléfono)
+   ========================================================================== */
+
+@media (max-width: 1000px) {
+    .social-rail {
+        right: 16px;
+        gap: 10px;
+    }
+
+    .social-rail::before,
+    .social-rail::after {
+        height: 34px;
+    }
+
+    .social-rail .social-link {
+        width: 42px;
+        height: 42px;
+    }
+
+    .hero-grid,
+    .about-grid,
+    .skills-layout,
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-content {
+        max-width: 850px;
+    }
+
+    .hero-card-wrapper {
+        margin-top: 30px;
+    }
+
+    /* En una columna no hay espacio "afuera" a la izquierda para el sello */
+    .hero-seal {
+        display: none;
+    }
+
+    .hero::before,
+    .hero::after {
+        opacity: 0.45;
+    }
+
+    .hero-constellation {
+        right: -220px;
+        width: 760px;
+        opacity: 0.14;
+    }
+
+    .about-grid,
+    .contact-grid {
+        gap: 60px;
+    }
+
+    .about-visual {
+        width: min(100%, 580px);
+        margin-inline: auto;
+    }
+
+    .skills-intro {
+        position: static;
+    }
+
+    .process-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .process-card:nth-child(3) {
+        border-left: 0;
+        border-top: 1px solid var(--border);
+    }
+
+    .process-card:nth-child(4) {
+        border-top: 1px solid var(--border);
+    }
+}
+
+@media (max-width: 820px) {
+    .menu-button {
+        position: relative;
+        z-index: 1002;
+        display: block;
+    }
+
+    .menu-button.active span:nth-child(1) {
+        transform: translateY(6px) rotate(45deg);
+    }
+
+    .menu-button.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .menu-button.active span:nth-child(3) {
+        transform: translateY(-6px) rotate(-45deg);
+    }
+
+    .nav-list {
+        position: fixed;
+        inset: 0;
+        z-index: 1001;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 28px;
+        background: radial-gradient(circle at center, rgba(87, 23, 37, 0.28), transparent 45%), rgba(7, 7, 7, 0.98);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-15px);
+        transition: opacity var(--transition), visibility var(--transition), transform var(--transition);
+    }
+
+    .nav-list.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .nav-link {
+        font-family: var(--font-title);
+        font-size: 1.2rem;
+    }
+
+    .project-card,
+    .project-card:nth-child(3n) {
+        grid-column: span 12;
+    }
+
+    /* ---- Detalle del proyecto: de dos columnas a una ------------------- */
+
+    .gp-detail-panel {
+        grid-template-rows: 78px 1fr 86px;
+    }
+
+    .gp-detail-close {
+        top: 16px;
+        right: 16px;
+        width: 46px;
+        height: 46px;
+    }
+
+    .gp-detail-top {
+        justify-content: flex-start;
+        padding-left: 24px;
+    }
+
+    /* La línea del medio separaba las dos columnas: ya no hay dos */
+    .gp-detail-line-mid {
+        display: none;
+    }
+
+    .gp-detail-middle {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        overflow-y: auto;
+    }
+
+    /* El texto sigue entrando desde abajo, ahora anclado al pie del bloque */
+    .gp-detail-left {
+        min-height: 54vh;
+        align-items: flex-end;
+        padding: 30px 24px;
+    }
+
+    .gp-detail-copy {
+        top: auto;
+        right: 24px;
+        bottom: 30px;
+        left: 24px;
+        max-width: none;
+        transform: translateY(105%);
+    }
+
+    .gp-detail-copy.is-active {
+        transform: translateY(0);
+    }
+
+    .gp-detail-copy h2 {
+        font-size: clamp(2rem, 9vw, 3.2rem);
+    }
+
+    .gp-detail-facts div {
+        grid-template-columns: 100px 1fr;
+        gap: 14px;
+    }
+
+    .gp-detail-right {
+        min-height: 56vh;
+        padding: 0 24px 36px;
+    }
+
+    .gp-detail-gallery {
+        top: 0;
+        right: 24px;
+        left: 24px;
+        max-width: none;
+        gap: 12px;
+    }
+
+    /* Menos columnas de miniaturas para que no queden diminutas */
+    .gp-gallery-thumbs {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .gp-detail-bottom {
+        gap: 22px;
+        justify-content: flex-start;
+        padding: 0 24px;
+    }
+}
+
+@media (max-width: 640px) {
+    .logo {
+        gap: 9px;
+    }
+
+    .logo-symbol {
+        width: 40px;
+        height: 40px;
+    }
+
+    .logo-text {
+        font-size: 0.66rem;
+        letter-spacing: 0.14em;
+    }
+
+    .social-rail {
+        top: auto;
+        right: 14px;
+        bottom: 18px;
+        gap: 8px;
+        transform: none;
+    }
+
+    .social-rail::before,
+    .social-rail::after {
+        display: none;
+    }
+
+    .social-rail .social-link {
+        width: 40px;
+        height: 40px;
+    }
+
+    .social-rail .social-link svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    .container {
+        width: min(calc(100% - 28px), var(--container));
+    }
+
+    /* En una columna todo ocupa el ancho completo: un desplazamiento lateral
+       de 46px se recorta demasiado. Se mantiene la dirección, más corta. */
+    .reveal-left {
+        --reveal-from: -22px 0;
+    }
+
+    .reveal-right {
+        --reveal-from: 22px 0;
+    }
+
+    .section {
+        padding: 90px 0;
+    }
+
+    .hero {
+        min-height: auto;
+        padding-top: 140px;
+    }
+
+    .hero-title .editorial {
+        margin-left: 0;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .button {
+        width: 100%;
+    }
+
+    .hero-meta {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .portrait {
+        min-height: 410px;
+    }
+
+    .about-visual {
+        min-height: 430px;
+    }
+
+    .about-frame {
+        inset: 20px;
+    }
+
+    .statistics {
+        grid-template-columns: 1fr;
+    }
+
+    .statistic + .statistic {
+        border-top: 1px solid var(--border);
+        border-left: 0;
+    }
+
+    .project-card,
+    .project-card:nth-child(3n) {
+        min-height: 520px;
+    }
+
+    /* Recorte un poco más discreto en pantallas chicas (mantiene la
+       proporción: el radio de la puntita acompaña al de las muescas) */
+    .project-card {
+        --notch-gap: 8px;
+        --notch-size: 12px;
+        --notch-radius: 10px;
+    }
+
+    .project-pill {
+        padding: 8px 12px;
+        font-size: 0.55rem;
+        letter-spacing: 0.16em;
+    }
+
+    .project-content {
+        padding: 26px 22px;
+    }
+
+    .project-footer {
+        align-items: flex-end;
+    }
+
+    .mock-browser {
+        top: 12%;
+        left: 6%;
+        width: 88%;
+    }
+
+    .skill-item {
+        grid-template-columns: 48px 1fr;
+    }
+
+    .skills-list {
+        padding-left: 18px;
+    }
+
+    .skill-item::before {
+        left: -23px;
+    }
+
+    .skill-tools {
+        grid-column: 2;
+        max-width: none;
+        text-align: left;
+    }
+
+    .process-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .process-card + .process-card,
+    .process-card:nth-child(3),
+    .process-card:nth-child(4) {
+        border-top: 1px solid var(--border);
+        border-left: 0;
+    }
+
+    .process-card {
+        min-height: auto;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .contact-form {
+        padding: 28px 22px;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .quote-section::before {
+        font-size: 16rem;
+    }
+}
