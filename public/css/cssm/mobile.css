@@ -98,16 +98,31 @@
         transform: translateY(-6px) rotate(-45deg);
     }
 
+    body.menu-open .header,
+    body.menu-open .header.scrolled,
+    .header.menu-active,
+    .header.menu-active.scrolled {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
     .nav-list {
         position: fixed;
         inset: 0;
         z-index: 1001;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100dvh;
         display: flex;
         flex-direction: column;
         justify-content: center;
         gap: 28px;
         background: radial-gradient(circle at center, rgba(87, 23, 37, 0.28), transparent 45%), rgba(7, 7, 7, 0.98);
         opacity: 0;
+        overflow: hidden;
+        overscroll-behavior: none;
+        touch-action: none;
         visibility: hidden;
         transform: translateY(-15px);
         transition: opacity var(--transition), visibility var(--transition), transform var(--transition);

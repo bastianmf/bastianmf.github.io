@@ -74,8 +74,18 @@ body {
     overflow-x: hidden;
 }
 
+html.menu-open,
 body.menu-open {
     overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+}
+
+body.menu-open {
+    position: fixed;
+    left: 0;
+    right: 0;
+    width: 100%;
 }
 
 /* El header fijo no debe tapar el título de la sección al navegar por anclas */

@@ -71,15 +71,58 @@
     const setupMenu = () => {
         const menuButton = document.getElementById("menuButton");
         const navList = document.getElementById("navList");
+        const header = document.getElementById("header");
 
         if (!menuButton || !navList) {
             return;
         }
 
+        let lockedScrollY = 0;
+        const scrollKeys = new Set([
+            " ",
+            "ArrowDown",
+            "ArrowUp",
+            "End",
+            "Home",
+            "PageDown",
+            "PageUp",
+        ]);
+
+        const isMenuActive = () => navList.classList.contains("active");
+
+        const lockScroll = () => {
+            lockedScrollY = window.scrollY;
+            document.documentElement.classList.add("menu-open");
+            document.body.classList.add("menu-open");
+            document.body.style.top = `-${lockedScrollY}px`;
+            header?.classList.add("menu-active");
+            navList.scrollTop = 0;
+        };
+
+        const unlockScroll = () => {
+            document.documentElement.classList.remove("menu-open");
+            document.body.classList.remove("menu-open");
+            header?.classList.remove("menu-active");
+            document.body.style.top = "";
+            window.scrollTo(0, lockedScrollY);
+        };
+
+        const preventMenuScroll = (event) => {
+            if (!isMenuActive()) {
+                return;
+            }
+
+            event.preventDefault();
+        };
+
         const closeMenu = () => {
+            if (!isMenuActive()) {
+                return;
+            }
+
             navList.classList.remove("active");
             menuButton.classList.remove("active");
-            document.body.classList.remove("menu-open");
+            unlockScroll();
             menuButton.setAttribute("aria-expanded", "false");
             menuButton.setAttribute("aria-label", "Abrir menú");
         };
@@ -88,7 +131,11 @@
             const isActive = navList.classList.toggle("active");
 
             menuButton.classList.toggle("active", isActive);
-            document.body.classList.toggle("menu-open", isActive);
+            if (isActive) {
+                lockScroll();
+            } else {
+                unlockScroll();
+            }
             menuButton.setAttribute("aria-expanded", String(isActive));
             menuButton.setAttribute(
                 "aria-label",
@@ -101,9 +148,27 @@
         });
 
         document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape" && navList.classList.contains("active")) {
+            if (!isMenuActive()) {
+                return;
+            }
+
+            if (event.key === "Escape") {
                 closeMenu();
                 menuButton.focus();
+                return;
+            }
+
+            if (scrollKeys.has(event.key)) {
+                event.preventDefault();
+            }
+        });
+
+        window.addEventListener("wheel", preventMenuScroll, { passive: false });
+        window.addEventListener("touchmove", preventMenuScroll, { passive: false });
+
+        window.addEventListener("resize", () => {
+            if (window.innerWidth > 820) {
+                closeMenu();
             }
         });
     };
