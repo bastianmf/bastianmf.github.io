@@ -1,7 +1,7 @@
 <aside class="social-rail" aria-label="Redes sociales">
     <a
         class="social-link reveal reveal-down"
-        style="--i: 7"
+        style="--i: 0"
         href="https://www.linkedin.com/in/bastianmf/"
         target="_blank"
         rel="noopener noreferrer"
@@ -14,7 +14,7 @@
 
     <a
         class="social-link reveal reveal-down"
-        style="--i: 8"
+        style="--i: 1"
         href="https://www.instagram.com/bhxzty/"
         target="_blank"
         rel="noopener noreferrer"
@@ -29,7 +29,7 @@
 
     <a
         class="social-link reveal reveal-down"
-        style="--i: 9"
+        style="--i: 2"
         href="https://wa.me/56996176747"
         target="_blank"
         rel="noopener noreferrer"

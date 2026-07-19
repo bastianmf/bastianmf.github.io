@@ -135,7 +135,10 @@
         }
 
         if (!("IntersectionObserver" in window)) {
-            revealElements.forEach((el) => el.classList.add("visible"));
+            revealElements.forEach((el) => {
+                el.classList.add("visible");
+                el.closest(".social-rail")?.classList.add("social-rail-visible");
+            });
             return;
         }
 
@@ -144,6 +147,9 @@
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add("visible");
+                        entry.target
+                            .closest(".social-rail")
+                            ?.classList.add("social-rail-visible");
                         observer.unobserve(entry.target);
                     }
                 });
