@@ -72,12 +72,16 @@ class PortfolioController extends Controller
      *             se usa si un proyecto no tiene galería.
      * summary     Texto largo del panel de detalle.
      * facts       Pares dato/valor del panel (3 se ven bien).
-     * gallery     Capturas del proyecto: cada una con img, title y caption. La
-     *             primera es la portada de la card; todas forman las pestañas de
-     *             imagen (image tabs) del panel de detalle.
+     * gallery     Ítems del panel de detalle (image tabs). Cada ítem es:
+     *               - Imagen: ['img' => ..., 'title' => ..., 'caption' => ...]
+     *               - Video:  ['type' => 'video', 'src' => ..., 'poster' => ...,
+     *                          'title' => ..., 'caption' => ..., 'duration' => '38 s']
+     *             La PORTADA de la card es siempre la primera IMAGEN de la
+     *             galería (los videos no sirven de portada). Los videos van al
+     *             inicio para que la demo del sistema sea lo primero que se ve.
      * url         Enlace al proyecto ('#' mientras no exista).
      *
-     * @return array<int, array{numeral: string, category: string, image: string, kicker: string, title: string, description: string, summary: string, facts: array<int, array{k: string, v: string}>, gallery: array<int, array{img: string, title: string, caption: string}>, tags: array<int, string>, url: string}>
+     * @return array<int, array{numeral: string, category: string, image: string, kicker: string, title: string, description: string, summary: string, facts: array<int, array{k: string, v: string}>, gallery: array<int, array<string, string>>, tags: array<int, string>, url: string}>
      */
     private function projects(): array
     {
@@ -96,6 +100,8 @@ class PortfolioController extends Controller
                     ['k' => 'Stack', 'v' => 'Laravel · MySQL · APIs REST'],
                 ],
                 'gallery' => [
+                    ['type' => 'video', 'src' => 'videos/proyectos/cotizador/cotiz-index.mp4', 'poster' => 'images/proyectos/cotizador/poster-cotiz-index.jpg', 'title' => 'Recorrido del listado', 'caption' => 'Búsqueda, filtros y apertura de una cotización, en vivo.', 'duration' => '38 s'],
+                    ['type' => 'video', 'src' => 'videos/proyectos/cotizador/cotiz-crear.mp4', 'poster' => 'images/proyectos/cotizador/poster-cotiz-crear.jpg', 'title' => 'Crear una cotización', 'caption' => 'Armado de una cotización desde cero, con productos y totales.', 'duration' => '38 s'],
                     ['img' => 'images/proyectos/cotizador/1.jpg', 'title' => 'Panel de cotizaciones', 'caption' => 'Vista general con métricas, listado y dólar referencial para seguir cada cotización.'],
                     ['img' => 'images/proyectos/cotizador/2.jpg', 'title' => 'Detalle de la cotización', 'caption' => 'Desglose de productos, cantidades y totales de una cotización.'],
                     ['img' => 'images/proyectos/cotizador/3.jpg', 'title' => 'Armado de la cotización', 'caption' => 'Ítems propuestos, resumen y datos de despacho y pago al crearla.'],
@@ -118,6 +124,8 @@ class PortfolioController extends Controller
                     ['k' => 'Stack', 'v' => 'Laravel · Chilexpress · Pagos'],
                 ],
                 'gallery' => [
+                    ['type' => 'video', 'src' => 'videos/proyectos/ecommerce-sc/ec-index.mp4', 'poster' => 'images/proyectos/ecommerce-sc/poster-ec-index.jpg', 'title' => 'Recorrido de la tienda', 'caption' => 'Portada, categorías y navegación del catálogo, en vivo.', 'duration' => '23 s'],
+                    ['type' => 'video', 'src' => 'videos/proyectos/ecommerce-sc/ec-compra.mp4', 'poster' => 'images/proyectos/ecommerce-sc/poster-ec-compra.jpg', 'title' => 'Flujo de compra', 'caption' => 'Del producto al carrito y al checkout, paso a paso.', 'duration' => '31 s'],
                     ['img' => 'images/proyectos/ecommerce-sc/1.jpg', 'title' => 'Portada de la tienda', 'caption' => 'Home con hero de destacados y accesos a las categorías principales.'],
                     ['img' => 'images/proyectos/ecommerce-sc/2.jpg', 'title' => 'Productos por categoría', 'caption' => 'Vista de una categoría con destacados y carrusel de productos.'],
                     ['img' => 'images/proyectos/ecommerce-sc/3.jpg', 'title' => 'Explorar por categoría', 'caption' => 'Grid de categorías para encontrar lo que se busca rápido.'],
@@ -144,6 +152,9 @@ class PortfolioController extends Controller
                     ['k' => 'Stack', 'v' => 'Blade · CSS · JavaScript'],
                 ],
                 'gallery' => [
+                    ['type' => 'video', 'src' => 'videos/proyectos/soytrabajador/st-tour.mp4', 'poster' => 'images/proyectos/soytrabajador/poster-st-tour.jpg', 'title' => 'Tour completo', 'caption' => 'Recorrido por las secciones del sitio, de arriba a abajo.', 'duration' => '44 s'],
+                    ['type' => 'video', 'src' => 'videos/proyectos/soytrabajador/st-home.mp4', 'poster' => 'images/proyectos/soytrabajador/poster-st-home.jpg', 'title' => 'Recorrido del sitio', 'caption' => 'Home editorial y áreas de práctica del estudio.', 'duration' => '29 s'],
+                    ['type' => 'video', 'src' => 'videos/proyectos/soytrabajador/st-hover.mp4', 'poster' => 'images/proyectos/soytrabajador/poster-st-hover.jpg', 'title' => 'Interacciones', 'caption' => 'Detalles y microinteracciones al pasar el cursor.', 'duration' => '33 s'],
                     ['img' => 'images/proyectos/soytrabajador/1.jpg', 'title' => 'Portada', 'caption' => 'Hero editorial: “Defendemos sólo a quien trabaja”.'],
                     ['img' => 'images/proyectos/soytrabajador/2.jpg', 'title' => 'Áreas de práctica', 'caption' => 'Las materias del derecho laboral que atiende el estudio.'],
                     ['img' => 'images/proyectos/soytrabajador/3.jpg', 'title' => 'Manifiesto', 'caption' => 'Sección de posición y compromiso del estudio.'],
@@ -168,6 +179,8 @@ class PortfolioController extends Controller
                     ['k' => 'Stack', 'v' => 'Python · Flask · Whisper'],
                 ],
                 'gallery' => [
+                    ['type' => 'video', 'src' => 'videos/proyectos/encuestas-spa/spa-encuesta.mp4', 'poster' => 'images/proyectos/encuestas-spa/poster-spa-encuesta.jpg', 'title' => 'Aplicar una encuesta', 'caption' => 'Flujo de levantamiento de una encuesta en terreno.', 'duration' => '36 s'],
+                    ['type' => 'video', 'src' => 'videos/proyectos/encuestas-spa/spa-estadisticas.mp4', 'poster' => 'images/proyectos/encuestas-spa/poster-spa-estadisticas.jpg', 'title' => 'Panel de estadísticas', 'caption' => 'KPIs, gráficos y exportes de resultados.', 'duration' => '35 s'],
                     ['img' => 'images/proyectos/encuestas-spa/1.jpg', 'title' => 'Panel administrativo', 'caption' => 'Gestión y seguimiento comunitario con métricas de comuneros y encuestas.'],
                     ['img' => 'images/proyectos/encuestas-spa/2.jpg', 'title' => 'Inicio de encuesta', 'caption' => 'Ingreso por RUT y datos del encuestado antes de comenzar.'],
                     ['img' => 'images/proyectos/encuestas-spa/3.jpg', 'title' => 'Aplicación de la encuesta', 'caption' => 'Preguntas por sección con respuestas que se van guardando.'],
@@ -193,6 +206,8 @@ class PortfolioController extends Controller
                     ['k' => 'Stack', 'v' => 'Laravel · Blade · CSS'],
                 ],
                 'gallery' => [
+                    ['type' => 'video', 'src' => 'videos/proyectos/secmap/secmap-home.mp4', 'poster' => 'images/proyectos/secmap/poster-secmap-home.jpg', 'title' => 'Recorrido del sitio', 'caption' => 'Home y propuesta de la empresa, en movimiento.', 'duration' => '36 s'],
+                    ['type' => 'video', 'src' => 'videos/proyectos/secmap/secmap-contacto.mp4', 'poster' => 'images/proyectos/secmap/poster-secmap-contacto.jpg', 'title' => 'Cobertura y contacto', 'caption' => 'Mapa de cobertura nacional y formulario de contacto.', 'duration' => '27 s'],
                     ['img' => 'images/proyectos/secmap/1.jpg', 'title' => 'Portada', 'caption' => 'Hero: “Conservación, mantención y apoyo operativo”.'],
                     ['img' => 'images/proyectos/secmap/2.jpg', 'title' => 'Aliado en terreno', 'caption' => 'Propuesta de valor y respaldo operativo de la empresa.'],
                     ['img' => 'images/proyectos/secmap/3.jpg', 'title' => 'Ecosistema operativo', 'caption' => 'Diagrama del flujo de trabajo de punta a punta.'],
@@ -239,6 +254,9 @@ class PortfolioController extends Controller
                     ['k' => 'Stack', 'v' => 'Laravel · MySQL · JavaScript'],
                 ],
                 'gallery' => [
+                    ['type' => 'video', 'src' => 'videos/proyectos/sistema-ot/ordenes.mp4', 'poster' => 'images/proyectos/sistema-ot/poster-ordenes.jpg', 'title' => 'Recorrido de órdenes', 'caption' => 'Listado de órdenes con estados y seguimiento, en vivo.', 'duration' => '36 s'],
+                    ['type' => 'video', 'src' => 'videos/proyectos/sistema-ot/avances.mp4', 'poster' => 'images/proyectos/sistema-ot/poster-avances.jpg', 'title' => 'Avances de la orden', 'caption' => 'Acciones rápidas y seguimiento de avances de una OT.', 'duration' => '30 s'],
+                    ['type' => 'video', 'src' => 'videos/proyectos/sistema-ot/firma.mp4', 'poster' => 'images/proyectos/sistema-ot/poster-firma.jpg', 'title' => 'Firma de la orden', 'caption' => 'Registro de la firma al cerrar una orden de trabajo.', 'duration' => '35 s'],
                     ['img' => 'images/proyectos/sistema-ot/1.jpg', 'title' => 'Detalle de la orden', 'caption' => 'La orden se abre en la misma fila con dispositivos, servicios y tareas.'],
                     ['img' => 'images/proyectos/sistema-ot/2.jpg', 'title' => 'Listado de órdenes', 'caption' => 'Tabla de órdenes con estados, responsables y métricas.'],
                     ['img' => 'images/proyectos/sistema-ot/3.jpg', 'title' => 'Nueva orden', 'caption' => 'Creación de una orden con su información básica y folios.'],
@@ -262,6 +280,8 @@ class PortfolioController extends Controller
                     ['k' => 'Stack', 'v' => 'Blade · CSS · JavaScript'],
                 ],
                 'gallery' => [
+                    ['type' => 'video', 'src' => 'videos/proyectos/soyhonorarios/sh-home.mp4', 'poster' => 'images/proyectos/soyhonorarios/poster-sh-home.jpg', 'title' => 'Recorrido del sitio', 'caption' => 'Home y propuesta del estudio, en movimiento.', 'duration' => '31 s'],
+                    ['type' => 'video', 'src' => 'videos/proyectos/soyhonorarios/sh-calculadora.mp4', 'poster' => 'images/proyectos/soyhonorarios/poster-sh-calculadora.jpg', 'title' => 'Calculadora en uso', 'caption' => 'Cálculo de indemnización paso a paso, en vivo.', 'duration' => '30 s'],
                     ['img' => 'images/proyectos/soyhonorarios/1.jpg', 'title' => 'Portada', 'caption' => 'Hero: “Recupera la indemnización que te corresponde”.'],
                     ['img' => 'images/proyectos/soyhonorarios/2.jpg', 'title' => 'Calculadora', 'caption' => 'Cálculo de indemnización paso a paso a partir de tus datos.'],
                     ['img' => 'images/proyectos/soyhonorarios/3.jpg', 'title' => 'Proceso', 'caption' => 'De la primera consulta al pago, explicado por etapas.'],

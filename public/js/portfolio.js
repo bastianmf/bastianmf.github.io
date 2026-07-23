@@ -111,6 +111,10 @@
     /* Cada card abre el panel con su numeral; dentro, sólo se activan el
        texto y la captura que llevan ese mismo numeral. */
 
+    /* ---- Detalle del proyecto — case study scrolleable ----------------- */
+    /* Cada card abre el case study de su obra: hero con la demo, y al bajar la
+       ficha, el recorrido pantalla por pantalla, el stack y el cierre. */
+
     const setupProjectDetail = () => {
         const overlay = document.getElementById("projectDetail");
 
@@ -118,146 +122,399 @@
             return;
         }
 
+        const scroll = document.getElementById("projectDetailScroll");
         const closeButton = document.getElementById("projectDetailClose");
         const triggers = document.querySelectorAll("[data-project-open]");
-        const copies = overlay.querySelectorAll("[data-project-detail]");
-        const galleries = overlay.querySelectorAll("[data-project-visual]");
-        const stage = overlay.querySelector(".gp-detail-right");
+        const cases = overlay.querySelectorAll("[data-project-case]");
+        const progressValue = overlay.querySelector("[data-detail-progress]");
 
-        const AUTOPLAY_MS = 3000;
         const reducedMotion = window.matchMedia(
             "(prefers-reduced-motion: reduce)"
         ).matches;
 
         let lastTrigger = null;
-        let autoplayTimer = null;
+        let activeMedia = null;
+        const userPausedMedia = new WeakSet();
 
-        // Aplica una miniatura: cambia imagen y texto de su propia galería
-        const activateThumb = (thumb) => {
-            const gallery = thumb.closest(".gp-detail-gallery");
+        const isOpen = () => overlay.classList.contains("is-open");
 
-            if (!gallery) {
+        /* ---- Players de video inline ---------------------------------- */
+        /* Se precarga al acercarse y solo reproduce la escena en foco. */
+
+        const getVideo = (media) => media?.querySelector("video.gp-media-el");
+
+        const loadMedia = (media) => {
+            const video = getVideo(media);
+
+            if (!video || video.getAttribute("src")) {
+                return video;
+            }
+
+            video.setAttribute("src", media.dataset.src);
+            video.load();
+
+            return video;
+        };
+
+        const pauseMedia = (media, reset = false) => {
+            const video = getVideo(media);
+
+            if (!video) {
                 return;
             }
 
-            const stage = gallery.querySelector(".gp-stage-img");
-            const capTitle = gallery.querySelector(".gp-cap-title");
-            const capText = gallery.querySelector(".gp-cap-text");
+            try {
+                video.pause();
 
-            if (stage && stage.getAttribute("src") !== thumb.dataset.src) {
-                stage.setAttribute("src", thumb.dataset.src);
-                stage.setAttribute("alt", thumb.dataset.title);
-                // Re-dispara la animación de aparición del stage
-                stage.style.animation = "none";
-                void stage.offsetWidth;
-                stage.style.animation = "";
+                if (reset) {
+                    video.removeAttribute("src");
+                    video.load();
+                }
+            } catch (error) {
+                /* El reproductor todavía no tenía una fuente activa. */
             }
 
-            if (capTitle) {
-                capTitle.textContent = thumb.dataset.title;
+            video.controls = false;
+            media.classList.remove("is-playing");
+
+            if (activeMedia === media) {
+                activeMedia = null;
             }
-
-            if (capText) {
-                capText.textContent = thumb.dataset.caption;
-            }
-
-            gallery.querySelectorAll(".gp-thumb").forEach((item) => {
-                const isActive = item === thumb;
-
-                item.classList.toggle("is-active", isActive);
-                item.setAttribute("aria-selected", String(isActive));
-            });
         };
 
-        // Click en cualquier miniatura. Al elegir a mano, se reinicia el
-        // conteo para no saltar de imagen enseguida.
-        galleries.forEach((gallery) => {
-            gallery.querySelectorAll(".gp-thumb").forEach((thumb) => {
-                thumb.addEventListener("click", () => {
-                    activateThumb(thumb);
-                    restartAutoplay();
+        const playMedia = (media) => {
+            const video = getVideo(media);
+
+            if (!video) {
+                return;
+            }
+
+            overlay
+                .querySelectorAll(".gp-media.is-video.is-playing")
+                .forEach((item) => {
+                    if (item !== media) {
+                        pauseMedia(item);
+                    }
                 });
+
+            loadMedia(media);
+            video.controls = false;
+            media.classList.add("is-playing");
+            activeMedia = media;
+
+            const played = video.play();
+
+            if (played && typeof played.catch === "function") {
+                played.catch(() => {
+                    video.controls = false;
+                    media.classList.remove("is-playing");
+
+                    if (activeMedia === media) {
+                        activeMedia = null;
+                    }
+                });
+            }
+        };
+
+        const resetMedia = (media) => {
+            userPausedMedia.delete(media);
+            pauseMedia(media, true);
+        };
+
+        const pauseAllVideos = () => {
+            overlay
+                .querySelectorAll(".gp-media.is-video")
+                .forEach((media) => resetMedia(media));
+        };
+
+        overlay.querySelectorAll(".gp-media[data-video]").forEach((media) => {
+            const play = media.querySelector(".gp-media-play");
+            const video = getVideo(media);
+
+            if (play) {
+                play.addEventListener("click", () => {
+                    if (video && !video.paused) {
+                        userPausedMedia.add(media);
+                        pauseMedia(media);
+                    } else {
+                        userPausedMedia.delete(media);
+                        playMedia(media);
+                    }
+                });
+            }
+
+            video?.addEventListener("play", () => {
+                activeMedia = media;
+                media.classList.add("is-playing");
+                play?.setAttribute(
+                    "aria-label",
+                    `Pausar video: ${media.dataset.videoTitle || "demo"}`
+                );
             });
-        });
 
-        /* ---- Autoplay: avanza la galería activa cada 3s ---------------- */
+            video?.addEventListener("pause", () => {
+                media.classList.remove("is-playing");
+                play?.setAttribute(
+                    "aria-label",
+                    `Reproducir video: ${media.dataset.videoTitle || "demo"}`
+                );
 
-        const advance = () => {
-            const gallery = overlay.querySelector(
-                ".gp-detail-gallery.is-active"
-            );
-
-            if (!gallery) {
-                return;
-            }
-
-            const thumbs = gallery.querySelectorAll(".gp-thumb");
-
-            // Con una sola imagen no hay nada que rotar
-            if (thumbs.length < 2) {
-                return;
-            }
-
-            const current = gallery.querySelector(".gp-thumb.is-active");
-            const index = Array.prototype.indexOf.call(thumbs, current);
-            const next = thumbs[(index + 1) % thumbs.length];
-
-            activateThumb(next);
-        };
-
-        const stopAutoplay = () => {
-            if (autoplayTimer !== null) {
-                window.clearInterval(autoplayTimer);
-                autoplayTimer = null;
-            }
-        };
-
-        const startAutoplay = () => {
-            // Sin movimiento reducido, y sólo con el panel abierto
-            if (reducedMotion || !overlay.classList.contains("is-open")) {
-                return;
-            }
-
-            stopAutoplay();
-            autoplayTimer = window.setInterval(advance, AUTOPLAY_MS);
-        };
-
-        const restartAutoplay = () => {
-            stopAutoplay();
-            startAutoplay();
-        };
-
-        // Pausa mientras el mouse está sobre la galería (para poder leer)
-        if (stage) {
-            stage.addEventListener("mouseenter", stopAutoplay);
-            stage.addEventListener("mouseleave", startAutoplay);
-        }
-
-        const showProject = (key) => {
-            let found = false;
-
-            copies.forEach((copy) => {
-                const isActive = copy.dataset.projectDetail === key;
-
-                copy.classList.toggle("is-active", isActive);
-
-                if (isActive) {
-                    found = true;
+                if (activeMedia === media) {
+                    activeMedia = null;
                 }
             });
 
-            galleries.forEach((gallery) => {
-                const isActive = gallery.dataset.projectVisual === key;
+            video?.addEventListener("ended", () => {
+                media.classList.remove("is-playing");
+                video.controls = false;
+                play?.setAttribute(
+                    "aria-label",
+                    `Reproducir video: ${media.dataset.videoTitle || "demo"}`
+                );
 
-                gallery.classList.toggle("is-active", isActive);
+                if (activeMedia === media) {
+                    activeMedia = null;
+                }
+            });
+        });
 
-                // Cada vez que se abre un proyecto, su galería vuelve a la 1ª
+        /* ---- Autoplay por visibilidad -------------------------------- */
+
+        const videoVisibility = new Map();
+        let videoObserver = null;
+
+        const syncVisibleVideo = () => {
+            if (reducedMotion || !isOpen()) {
+                return;
+            }
+
+            const activeCase = overlay.querySelector(".gp-case.is-active");
+
+            if (!activeCase) {
+                return;
+            }
+
+            const candidate = [...videoVisibility.entries()]
+                .filter(
+                    ([media, ratio]) =>
+                        ratio >= 0.52 &&
+                        activeCase.contains(media) &&
+                        !userPausedMedia.has(media)
+                )
+                .sort((a, b) => b[1] - a[1])[0]?.[0];
+
+            if (candidate) {
+                if (candidate !== activeMedia) {
+                    playMedia(candidate);
+                }
+
+                return;
+            }
+
+            if (
+                activeMedia &&
+                (videoVisibility.get(activeMedia) || 0) < 0.18
+            ) {
+                pauseMedia(activeMedia);
+            }
+        };
+
+        if ("IntersectionObserver" in window) {
+            videoObserver = new IntersectionObserver(
+                (entries) => {
+                    const activeCase = overlay.querySelector(
+                        ".gp-case.is-active"
+                    );
+
+                    entries.forEach((entry) => {
+                        const media = entry.target;
+
+                        videoVisibility.set(media, entry.intersectionRatio);
+
+                        if (
+                            entry.isIntersecting &&
+                            isOpen() &&
+                            activeCase?.contains(media)
+                        ) {
+                            loadMedia(media);
+                        }
+
+                        if (entry.intersectionRatio < 0.18) {
+                            userPausedMedia.delete(media);
+                        }
+                    });
+
+                    syncVisibleVideo();
+                },
+                {
+                    root: scroll,
+                    rootMargin: "8% 0px 8% 0px",
+                    threshold: [0, 0.15, 0.35, 0.52, 0.7, 0.85],
+                }
+            );
+
+            overlay
+                .querySelectorAll(".gp-media[data-video]")
+                .forEach((media) => videoObserver.observe(media));
+        }
+
+        /* ---- Reveal al scrollear dentro del panel --------------------- */
+
+        let revealObserver = null;
+
+        if ("IntersectionObserver" in window) {
+            revealObserver = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("in");
+                            revealObserver.unobserve(entry.target);
+                        }
+                    });
+                },
+                { root: scroll, threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+            );
+        }
+
+        // (Re)prepara los reveals del case activo cada vez que se abre
+        const primeReveals = (caseEl) => {
+            caseEl.querySelectorAll(".gp-reveal").forEach((el) => {
+                if (revealObserver) {
+                    el.classList.remove("in");
+                    revealObserver.observe(el);
+                } else {
+                    el.classList.add("in");
+                }
+            });
+        };
+
+        /* ---- Efectos ligados al scroll del panel (PagREF) ------------- */
+        /* Fold: el video del hero se expande (--fold 0→1). Spiral: los
+           numerales del recorrido giran. Todo con el scroll de este panel. */
+
+        const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+        let fxTicking = false;
+
+        const updateFx = () => {
+            fxTicking = false;
+
+            const activeCase = overlay.querySelector(".gp-case.is-active");
+
+            if (!activeCase || !scroll) {
+                return;
+            }
+
+            const maxScroll = Math.max(
+                1,
+                scroll.scrollHeight - scroll.clientHeight
+            );
+            const caseProgress = clamp(scroll.scrollTop / maxScroll, 0, 1);
+            const viewportRect = scroll.getBoundingClientRect();
+            const viewportCenter =
+                viewportRect.top + viewportRect.height * 0.52;
+
+            overlay.style.setProperty(
+                "--case-progress",
+                caseProgress.toFixed(4)
+            );
+
+            if (progressValue) {
+                progressValue.textContent = String(
+                    Math.round(caseProgress * 100)
+                ).padStart(2, "0");
+            }
+
+            let focusedStep = null;
+            let closestDistance = Number.POSITIVE_INFINITY;
+            const steps = activeCase.querySelectorAll("[data-case-step]");
+
+            steps.forEach((step) => {
+                const rect = step.getBoundingClientRect();
+                const isVisible =
+                    rect.bottom > viewportRect.top + viewportRect.height * 0.16 &&
+                    rect.top < viewportRect.bottom - viewportRect.height * 0.16;
+                const distance = Math.abs(
+                    rect.top + rect.height / 2 - viewportCenter
+                );
+
+                if (isVisible && distance < closestDistance) {
+                    closestDistance = distance;
+                    focusedStep = step;
+                }
+            });
+
+            steps.forEach((step) => {
+                step.classList.toggle("is-focus", step === focusedStep);
+            });
+
+            if (reducedMotion) {
+                return;
+            }
+
+            // Fold del hero: progreso del scroll dentro del tramo alto del hero
+            const hero = activeCase.querySelector("[data-fold-hero]");
+
+            if (hero) {
+                const rel =
+                    hero.getBoundingClientRect().top -
+                    viewportRect.top;
+                const travel = hero.offsetHeight - scroll.clientHeight;
+                const progress = travel > 0 ? clamp(-rel / travel, 0, 1) : 0;
+                const fold = clamp(progress / 0.6, 0, 1);
+                hero.style.setProperty("--fold", fold.toFixed(3));
+            }
+
+            activeCase
+                .querySelectorAll(".gp-step-index-orbit[data-spin]")
+                .forEach((orbit) => {
+                    const rect = orbit.getBoundingClientRect();
+                    const progress = clamp(
+                        (viewportRect.bottom - rect.top) /
+                            (viewportRect.height + rect.height),
+                        0,
+                        1
+                    );
+                    const direction = Number(orbit.dataset.spin) || 1;
+                    const angle = (progress - 0.5) * 38 * direction;
+
+                    orbit.style.setProperty("--spin", angle.toFixed(2));
+                });
+        };
+
+        const onPanelScroll = () => {
+            if (!fxTicking) {
+                window.requestAnimationFrame(updateFx);
+                fxTicking = true;
+            }
+        };
+
+        if (scroll) {
+            scroll.addEventListener("scroll", onPanelScroll, { passive: true });
+        }
+
+        window.addEventListener("resize", onPanelScroll, { passive: true });
+
+        /* ---- Mostrar / abrir / cerrar --------------------------------- */
+
+        const showProject = (key) => {
+            // Al cambiar de obra, corta cualquier video de la anterior
+            pauseAllVideos();
+            videoVisibility.clear();
+
+            let found = false;
+
+            cases.forEach((caseEl) => {
+                const isActive = caseEl.dataset.projectCase === key;
+
+                caseEl.classList.toggle("is-active", isActive);
+
                 if (isActive) {
-                    const firstThumb = gallery.querySelector(".gp-thumb");
-
-                    if (firstThumb) {
-                        activateThumb(firstThumb);
-                    }
+                    found = true;
+                } else {
+                    caseEl
+                        .querySelectorAll("[data-case-step]")
+                        .forEach((step) => step.classList.remove("is-focus"));
                 }
             });
 
@@ -270,26 +527,58 @@
             }
 
             lastTrigger = trigger;
+            document.documentElement.classList.add("detail-lock");
             document.body.classList.add("detail-lock");
             overlay.classList.add("is-open");
             overlay.setAttribute("aria-hidden", "false");
 
+            if (scroll) {
+                scroll.scrollTop = 0;
+            }
+
+            const activeCase = overlay.querySelector(".gp-case.is-active");
+
+            if (activeCase) {
+                primeReveals(activeCase);
+            }
+
+            // Estado inicial de los efectos (fold 0, numerales sin girar)
+            updateFx();
+            window.requestAnimationFrame(updateFx);
+
             // Espera a que el panel sea visible para poder enfocar
             window.setTimeout(() => closeButton?.focus(), 120);
 
-            // Arranca el pase automático tras la entrada del panel
-            window.setTimeout(startAutoplay, 800);
+            // La demo destacada arranca sola (muted) tras la entrada del panel,
+            // salvo que se pida movimiento reducido.
+            window.setTimeout(() => {
+                if (reducedMotion || !activeCase) {
+                    return;
+                }
+
+                const hero = activeCase.querySelector(".gp-media[data-featured]");
+
+                if (hero) {
+                    playMedia(hero);
+                }
+            }, 850);
         };
 
         const closeDetail = () => {
-            stopAutoplay();
+            pauseAllVideos();
+            videoVisibility.clear();
             overlay.classList.remove("is-open");
             overlay.setAttribute("aria-hidden", "true");
+            overlay.style.setProperty("--case-progress", "0");
+
+            if (progressValue) {
+                progressValue.textContent = "00";
+            }
+
+            document.documentElement.classList.remove("detail-lock");
             document.body.classList.remove("detail-lock");
             lastTrigger?.focus();
         };
-
-        const isOpen = () => overlay.classList.contains("is-open");
 
         triggers.forEach((trigger) => {
             trigger.addEventListener("click", () => {
@@ -299,7 +588,7 @@
 
         closeButton?.addEventListener("click", closeDetail);
 
-        // Los enlaces del pie llevan a otra sección: cierran antes de navegar
+        // Los enlaces del cierre llevan a otra sección: cierran antes de navegar
         overlay.querySelectorAll("[data-detail-close]").forEach((link) => {
             link.addEventListener("click", closeDetail);
         });
@@ -314,13 +603,13 @@
                 return;
             }
 
-            // Es un diálogo modal: el foco no debe irse a la página de atrás
+            // Es un diálogo modal: el foco se queda entre la barra y el case
             if (event.key !== "Tab") {
                 return;
             }
 
             const focusables = overlay.querySelectorAll(
-                'button, a[href], [tabindex]:not([tabindex="-1"])'
+                '.gp-detail-top button, .gp-case.is-active a[href], .gp-case.is-active button, .gp-case.is-active [tabindex]:not([tabindex="-1"])'
             );
 
             if (!focusables.length) {

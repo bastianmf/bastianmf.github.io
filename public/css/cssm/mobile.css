@@ -77,6 +77,10 @@
     .process-card:nth-child(4) {
         border-top: 1px solid var(--border);
     }
+
+    .gp-case-folio {
+        display: none;
+    }
 }
 
 @media (max-width: 820px) {
@@ -144,86 +148,100 @@
         grid-column: span 12;
     }
 
-    /* ---- Detalle del proyecto: de dos columnas a una ------------------- */
-
-    .gp-detail-panel {
-        grid-template-rows: 78px 1fr 86px;
-    }
+    /* ---- Detalle del proyecto (case study) en móvil ------------------- */
 
     .gp-detail-close {
-        top: 16px;
-        right: 16px;
-        width: 46px;
-        height: 46px;
+        width: 44px;
+        height: 44px;
     }
 
-    .gp-detail-top {
-        justify-content: flex-start;
-        padding-left: 24px;
+    .gp-detail-progress {
+        top: 84px;
+        right: 20px;
+        bottom: auto;
+        left: 20px;
+        flex-direction: row;
+        gap: 10px;
+        width: auto;
+        height: 18px;
     }
 
-    /* La línea del medio separaba las dos columnas: ya no hay dos */
-    .gp-detail-line-mid {
+    .gp-detail-progress-track {
+        flex: 1 1 auto;
+        width: auto;
+        min-height: 1px;
+        height: 1px;
+    }
+
+    .gp-detail-progress-fill {
+        transform: scaleX(var(--case-progress, 0));
+        transform-origin: left;
+    }
+
+    .gp-case {
+        width: min(100% - 32px, 1200px);
+    }
+
+    /* En móvil el fold cansa: el video queda a tamaño fijo, sin tramo alto */
+    .gp-case-hero[data-fold-hero] {
+        min-height: 0;
+    }
+
+    .gp-case-hero-media {
+        position: static;
+        width: 100%;
+        max-width: none;
+    }
+
+    .gp-scroll-hint {
         display: none;
     }
 
-    .gp-detail-middle {
+    /* Labels laterales estorban en pantallas chicas */
+    .gp-fold-label {
+        display: none;
+    }
+
+    /* El "sobre el proyecto" pasa a una columna */
+    .gp-case-about {
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
-        overflow-y: auto;
+        gap: 24px;
     }
 
-    /* El texto sigue entrando desde abajo, ahora anclado al pie del bloque */
-    .gp-detail-left {
-        min-height: 54vh;
-        align-items: flex-end;
-        padding: 30px 24px;
+    /* El recorrido: media arriba, texto abajo (una columna) */
+    .gp-step {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        min-height: 0;
+        padding-block: 24px;
     }
 
-    .gp-detail-copy {
-        top: auto;
-        right: 24px;
-        bottom: 30px;
-        left: 24px;
-        max-width: none;
-        transform: translateY(105%);
+    .gp-steps {
+        gap: 32px;
     }
 
-    .gp-detail-copy.is-active {
-        transform: translateY(0);
+    .gp-steps::before,
+    .gp-step::after {
+        display: none;
     }
 
-    .gp-detail-copy h2 {
-        font-size: clamp(2rem, 9vw, 3.2rem);
+    /* En una columna, la media siempre va primero */
+    .gp-step-right .gp-step-media {
+        order: 0;
     }
 
-    .gp-detail-facts div {
-        grid-template-columns: 100px 1fr;
-        gap: 14px;
+    .gp-step-right .gp-step-copy {
+        order: 0;
     }
 
-    .gp-detail-right {
-        min-height: 56vh;
-        padding: 0 24px 36px;
+    .gp-step-index-orbit {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 12px;
     }
 
-    .gp-detail-gallery {
-        top: 0;
-        right: 24px;
-        left: 24px;
-        max-width: none;
-        gap: 12px;
-    }
-
-    /* Menos columnas de miniaturas para que no queden diminutas */
-    .gp-gallery-thumbs {
-        grid-template-columns: repeat(4, 1fr);
-    }
-
-    .gp-detail-bottom {
-        gap: 22px;
-        justify-content: flex-start;
-        padding: 0 24px;
+    .gp-step-index {
+        font-size: 2.15rem;
     }
 }
 

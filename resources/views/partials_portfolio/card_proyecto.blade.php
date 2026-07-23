@@ -26,7 +26,11 @@
     style="--i: {{ $slot === 1 ? 1 : 0 }}"
     data-category="{{ $project['category'] }}"
 >
-    @php $cover = $project['gallery'][0]['img'] ?? null; @endphp
+    @php
+        // Portada = primera IMAGEN de la galería (los ítems de video no sirven
+        // de portada; la galería puede empezar con videos).
+        $cover = collect($project['gallery'])->firstWhere('img', '!=', null)['img'] ?? null;
+    @endphp
 
     <div class="project-image {{ $project['image'] }}">
         @if ($cover)

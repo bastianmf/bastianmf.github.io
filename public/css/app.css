@@ -60,6 +60,27 @@ html {
     /* Evita el corrimiento lateral al abrir/cerrar contenido (Diseño_Skill) */
     overflow-y: scroll;
     scrollbar-gutter: stable;
+    scrollbar-color: var(--gold-dark) var(--black-soft);
+    scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--black-soft);
+}
+
+::-webkit-scrollbar-thumb {
+    border: 3px solid var(--black-soft);
+    border-radius: 999px;
+    background: var(--gold-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
 }
 
 body {
@@ -75,10 +96,20 @@ body {
 }
 
 html.menu-open,
-body.menu-open {
+html.detail-lock,
+body.menu-open,
+body.detail-lock {
     overflow: hidden;
     overscroll-behavior: none;
     touch-action: none;
+}
+
+html.detail-lock {
+    scrollbar-width: none;
+}
+
+html.detail-lock::-webkit-scrollbar {
+    display: none;
 }
 
 body.menu-open {
